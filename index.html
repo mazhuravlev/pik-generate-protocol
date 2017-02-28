@@ -1,0 +1,91 @@
+<html>
+<head>
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap-theme.min.css">
+    <script src="vendor/docxtemplater.js"></script>
+    <script src="vendor/asana-min.js"></script>
+    <script src="vendor/jszip.js"></script>
+    <script src="vendor/moment.js"></script>
+    <script src="vendor/file-saver.min.js"></script>
+    <script src="vendor/jszip-utils.js"></script>
+    <script src="vendor/jquery.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="script.js"></script>
+    <title>Генерация протокола совещания</title>
+</head>
+<body>
+<div class="container">
+    <h3>Генерация протокола совещания</h3>
+    <button class="btn btn-default" data-toggle="collapse" data-target="#help" type="button">Показать справку</button>
+    <br>
+    <br>
+    <div class="panel panel-default collapse" id="help">
+        <div class="panel-heading"><i class="glyphicon glyphicon-question-sign"></i> Справка</div>
+        <div class="panel-body">
+            <ul>
+                <li>Ввести ключ API Asana, он будет сохранен в случае удачного подключения</li>
+                <li>Ввести URL задачи Asana, нажать "Загрузить задачу", дождаться, пока кнопка станет зеленой</li>
+                <li>Указать файл шаблона протокола</li>
+                <li>Ввести требуемые данные в поля ниже</li>
+                <li>Нажать "Генерировать", файл будет загружен автоматически</li>
+            </ul>
+        </div>
+    </div>
+    <br>
+    <form>
+        <div class="form-group">
+            <label>API ключ</label>
+            <input class="form-control" type="text" id="apikey" size="140">
+        </div>
+        <br>
+        <div class="input-group">
+		  <span class="input-group-btn">
+			<button id="load_task" class="btn" type="button">Загрузить задачу</button>
+		  </span>
+            <input id="task_url" type="text" class="form-control" value="">
+        </div>
+        <br>
+        <button class="btn btn-default" data-toggle="collapse" data-target="#json-fiedls" type="button">Показать JSON
+        </button>
+        <br>
+        <div id="json-fiedls" class="collapse">
+            <div class="form-group">
+                <label>Json задачи</label>
+                <textarea class="form-control" id="task-json" rows="10" placeholder="json задачи"></textarea>
+            </div>
+            <br>
+            <div class="form-group">
+                <label>Json подзадач</label>
+                <textarea class="form-control" id="subtasks-json" rows="10" placeholder="json подзадач"></textarea>
+            </div>
+            <br>
+        </div>
+        <br>
+        <div class="form-group">
+            <label>Файл шаблона</label>
+            <input class="form-control" type="file" id="file-input" accept=".docx">
+        </div>
+        <br>
+        <div class="form-group">
+            <label>Председатель</label>
+            <input class="form-control" type="text" id="chairman" placeholder="председатель"
+                   value="">
+        </div>
+        <br>
+        <div class="form-group">
+            <label>Секретарь</label>
+            <input class="form-control" type="text" id="secretary" placeholder="председатель" value="">
+        </div>
+        <br>
+        <div class="form-group">
+            <label>Участники</label>
+            <textarea class="form-control" id="participants" rows="3" placeholder="участники"></textarea>
+        </div>
+        <br>
+        <button type="button" class="btn btn-block btn-primary" id="generate">Генерировать!</button>
+    </form>
+    <br>
+    <br>
+</div>
+</body>
+</html>
