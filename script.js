@@ -106,7 +106,7 @@ function click() {
 }
 
 function loadTask() {
-    let apikey = $("#apikey").val();
+    let apikey = "0/cc880fedbaec6446c336f3178bbce1bf"; //$("#apikey").val();
     if(!apikey) {
         alert("Нужно ввести API ключ");
         throw new Error();
@@ -117,17 +117,23 @@ function loadTask() {
         alert("Нужно указать валидный URL задачи");
         return;
     }
-
-    const client = Asana.Client.create().useAccessToken(apikey); //0/cc880fedbaec6446c336f3178bbce1bf
+    let loadButton = $("#load_task");
+    loadButton.removeClass("btn-primary");
+    const client = Asana.Client.create().useAccessToken(apikey);
     client.tasks.findById(taskMatches[1]).then(x => {
         $("#task-json").text(JSON.stringify(x));
         client.tasks.subtasks(taskMatches[1]).then(x => {
             $("#subtasks-json").text(JSON.stringify(x["data"]));
             taskLoaded = true;
-            $("#load_task").addClass("btn-success");
+            loadButton.addClass("btn-success");
             localStorage.setItem("apikey", apikey);
-        }, e => alert("Ошибка API Asana: " + e.message));
-    }, e => alert("Ошибка API Asana: " + e.message));
+        }, e => apiError(e.message, loadButton));
+    }, e => apiError(e.message, loadButton));
+}
+
+function apiError(message, button) {
+    alert("Ошибка API Asana: " + message);
+    button.addClass("btn-danger");
 }
 
 function getSigns(c, s, p) {
@@ -175,7 +181,7 @@ function getPad(len, ch) {
 }
 
 $(() => {
-    $("#apikey").val(localStorage.getItem("apikey"));
+    // $("#apikey").val(localStorage.getItem("apikey"));
     $("button#generate").click(click);
     $("button#load_task").click(loadTask);
 });
