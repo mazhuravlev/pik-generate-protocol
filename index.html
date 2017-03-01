@@ -1,9 +1,8 @@
 <html>
 <head>
     <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap-theme.min.css">
 
-    <!--<link rel="stylesheet" href="vendor/bootstrap/css/bootstrap-theme.min.css">-->
-    <!--<link rel="stylesheet" href="vendor/material.css">-->
     <script src="vendor/docxtemplater.js"></script>
     <script src="vendor/asana-min.js"></script>
     <script src="vendor/jszip.js"></script>
@@ -15,23 +14,6 @@
     <script src="script.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
     <title>Генерация протокола совещания</title>
-    <style>
-        body {
-            background-color: #fefefe;
-        }
-        label {
-            color: black !important;
-        }
-        .form-group input[type=file] {
-             opacity: 1 !important;
-        }
-        .input-group .input-group-btn {
-             padding: 0 !important;
-        }
-        .input-group input {
-            padding-left: 6px;
-        }
-    </style>
 </head>
 <body>
 <div class="container">
@@ -106,6 +88,10 @@
         <div class="form-group">
             <label>Файл шаблона</label>
             <input  type="file" id="file-input" accept=".docx">
+        </div>
+        <div class="form-group">
+            <label>Номер протокола</label>
+            <input class="form-control" type="text" id="protocol-number" placeholder="Номер протокола" value="">
         </div>
         <div class="form-group">
             <label>Председатель</label>

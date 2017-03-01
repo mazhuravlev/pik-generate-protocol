@@ -36,15 +36,17 @@ function generate(content) {
         throw new TaskFormatException("Неверный формат имени задачи");
     }
 
+    let noteData = getNoteData(task.notes);
+
     const zip = new JSZip(content);
     const doc = new Docxtemplater().loadZip(zip);
     let questions = getQuestions(subtasks);
     let answers = getAnswers(subtasks);
-    if(questions.length !== answers.length) {
+    if (questions.length !== answers.length) {
         throw new TaskFormatException("Не совпадает количество вопросов и ответов");
     }
     doc.setData({
-        protocol_number: task.notes,
+        protocol_number: val("#protocol-number"),
         topic: nameMatches[4],
         chairman: val("#chairman"),
         secretary: val("#secretary"),
@@ -64,6 +66,20 @@ function generate(content) {
         mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     });
     saveAs(out, `Протокол ${task.notes}.docx`);
+}
+
+function getNoteData(notes) {
+    let result = {};
+    try {
+        notes.split("\n").map(x => x.split(":")).forEach(x => {
+            if (x.length == 2) {
+                result[x[0].trim()] = x[1].trim();
+            }
+        });
+    } catch (e) {
+        throw new TaskFormatException("Неверный формат описания: " + e.message);
+    }
+    return result;
 }
 
 function val(selector) {
@@ -139,10 +155,11 @@ function loadTask() {
         throw new WorkflowException("Нужно указать валидный URL задачи");
     }
     let loadButton = $("#load_task");
-    loadButton.removeClass("btn-primary");
+    loadButton.removeClass("btn-primary").removeClass("btn-success");
     const client = Asana.Client.create().useAccessToken(apikey);
     client.tasks.findById(taskMatches[1]).then(x => {
         $("#task-json").text(JSON.stringify(x));
+        setProtocolPeople(getNoteData(x.notes));
         client.tasks.subtasks(taskMatches[1]).then(x => {
             $("#subtasks-json").text(JSON.stringify(x["data"]));
             taskLoaded = true;
@@ -155,6 +172,21 @@ function loadTask() {
 function apiError(message, button) {
     button.addClass("btn-danger");
     throw new WorkflowException("Ошибка API Asana: " + message);
+}
+
+function setProtocolPeople(noteData) {
+    if ("Номер" in noteData) {
+        $("#protocol-number").val(noteData["Номер"])
+    }
+    if ("Председатель" in noteData) {
+        $("#chairman").val(noteData["Председатель"])
+    }
+    if ("Секретарь" in noteData) {
+        $("#secretary").val(noteData["Секретарь"])
+    }
+    if ("Присутствовали" in noteData) {
+        $("#participants").val(noteData["Присутствовали"])
+    }
 }
 
 function getSigns(c, s, p) {
@@ -202,7 +234,7 @@ $(() => {
     // $("#apikey").val(localStorage.getItem("apikey"));
 
     $("#json-fiedls-buton").click((e) => {
-        if(!taskLoaded) {
+        if (!taskLoaded) {
             e.stopPropagation();
             alert("Нужно загрузить задачу из Asana");
         }
