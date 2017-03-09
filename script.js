@@ -36,15 +36,21 @@ function generate(content) {
         throw new TaskFormatException("Неверный формат имени задачи");
     }
 
+    let signs = getSigns(val("#chairman"), val("#secretary"), val("#participants"));
     let noteData = getNoteData(task.notes);
 
-    const zip = new JSZip(content);
-    const doc = new Docxtemplater().loadZip(zip);
+
     let questions = getQuestions(subtasks);
     let answers = getAnswers(subtasks);
     if (questions.length !== answers.length) {
         throw new TaskFormatException("Не совпадает количество вопросов и ответов");
     }
+    if(!content) {
+        console.log("Формат задачи ОК. Теперь выберите файл шаблона и нажмите генерировать.");
+        return;
+    }
+    const zip = new JSZip(content);
+    const doc = new Docxtemplater().loadZip(zip);
     doc.setData({
         protocol_number: val("#protocol-number"),
         topic: nameMatches[4],
@@ -56,7 +62,7 @@ function generate(content) {
         day: nameMatches[1],
         month: nameMatches[2],
         year: nameMatches[3],
-        signs: getSigns(val("#chairman"), val("#secretary"), val("#participants"))
+        signs: signs
     });
 
     doc.render();
@@ -94,14 +100,14 @@ function getAnswers(subtasks) {
     const answers = [];
     const answerData = subtasks.slice(index + 1);
     for (let i = 0; i < answerData.length; i++) {
-        if (/^По.+задаче:$/.exec(answerData[i])) {
+        if (/^По.+(задаче|вопросу):$/.exec(answerData[i])) {
             answers.push({
                 title: answerData[i],
                 subanswers: []
             });
         } else {
             if (answers.length === 0) {
-                throw new TaskFormatException("Первой строкой в блоке Решения должна быть 'По [такой-то] задаче:'");
+                throw new TaskFormatException("Первой строкой в блоке Решения должна быть 'По [такой-то] (задаче|вопросу):'");
             }
             answers[answers.length - 1].subanswers.push({
                 text: answerData[i]
@@ -132,16 +138,21 @@ function onSubmit() {
     if (!taskLoaded) {
         throw new WorkflowException("Нужно загрузить задачу из Asana");
     }
-    let file = $("#file-input").get(0).files[0];
-    if (!file) {
-        throw new WorkflowException("Нужно выбрать файл шаблона протокола");
-    }
-    const reader = new FileReader();
 
-    reader.onloadend = function () {
-        generate(reader.result);
-    };
-    reader.readAsBinaryString(file);
+    if (getFile()) {
+        const reader = new FileReader();
+
+        reader.onloadend = function () {
+            generate(reader.result);
+        };
+        reader.readAsBinaryString(getFile());
+    } else {
+        generate(null);
+    }
+}
+
+function getFile() {
+    return file = $("#file-input").get(0).files[0];
 }
 
 function loadTask() {
@@ -163,7 +174,8 @@ function loadTask() {
         client.tasks.subtasks(taskMatches[1]).then(x => {
             $("#subtasks-json").text(JSON.stringify(x["data"]));
             taskLoaded = true;
-            loadButton.addClass("btn-success");
+            loadButton.removeClass("btn-danger").addClass("btn-success");
+            $("form").submit();
             localStorage.setItem("apikey", apikey);
         }, e => apiError(e.message, loadButton));
     }, e => apiError(e.message, loadButton));
@@ -171,7 +183,7 @@ function loadTask() {
 
 function apiError(message, button) {
     button.addClass("btn-danger");
-    throw new WorkflowException("Ошибка API Asana: " + message);
+    alert("Ошибка API Asana: " + message);
 }
 
 function setProtocolPeople(noteData) {
@@ -190,7 +202,7 @@ function setProtocolPeople(noteData) {
 }
 
 function getSigns(c, s, p) {
-    const fioRegex = /(^[\wа-яА-Я]*\s+[\wа-яА-Я]\.[\wа-яА-Я]\.)/u;
+    const fioRegex = /(^[\wа-яА-Яё]*\s+[\wа-яА-Яё]\.[\wа-яА-Яё]\.)/u;
     let cMatches = fioRegex.exec(c.trim());
     if (!cMatches) {
         throw new WorkflowException("ФИО председателя невалидно, должно быть Фамилия И.О.");
