@@ -156,7 +156,7 @@ function getFile() {
 }
 
 function loadTask() {
-    let apikey = "0/cc880fedbaec6446c336f3178bbce1bf"; //$("#apikey").val();
+    let apikey = $("#apikey").val();
     if (!apikey) {
         throw new WorkflowException("Нужно ввести API ключ");
     }
@@ -243,7 +243,7 @@ function getPad(len, ch) {
 }
 
 $(() => {
-    // $("#apikey").val(localStorage.getItem("apikey"));
+    $("#apikey").val(localStorage.getItem("apikey"));
 
     $("#json-fiedls-buton").click((e) => {
         if (!taskLoaded) {
