@@ -45,9 +45,16 @@ function generate(content) {
     if (questions.length !== answers.length) {
         throw new TaskFormatException("Не совпадает количество вопросов и ответов");
     }
+
     if(!content) {
-        console.log("Формат задачи ОК. Теперь выберите файл шаблона и нажмите генерировать.");
-        return;
+        if(content = localStorage.getItem("zipTemplate")) {
+            // use last template
+        } else {
+            console.log("Формат задачи ОК. Теперь выберите файл шаблона и нажмите генерировать.");
+            return;
+        }
+    } else {
+        localStorage.setItem("zipTemplate", content);
     }
     const zip = new JSZip(content);
     const doc = new Docxtemplater().loadZip(zip);
@@ -242,9 +249,32 @@ function getPad(len, ch) {
     return pad;
 }
 
-$(() => {
-    // $("#apikey").val(localStorage.getItem("apikey"));
+function detectIE() {
+    let ua = window.navigator.userAgent;
+    let msie = ua.indexOf('MSIE ');
+    if (msie > 0) {
+        return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+    }
+    let trident = ua.indexOf('Trident/');
+    if (trident > 0) {
+        let rv = ua.indexOf('rv:');
+        return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+    }
+    let edge = ua.indexOf('Edge/');
+    if (edge > 0) {
+        return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
+    }
+    return false;
+}
 
+$(() => {
+    $("#apikey").val(localStorage.getItem("apikey"));
+    if(localStorage.getItem("zipTemplate")) {
+        $('#has-saved-template').show();
+    }
+    if(!detectIE()) {
+        $('#is-ie').hide();
+    }
     $("#json-fiedls-buton").click((e) => {
         if (!taskLoaded) {
             e.stopPropagation();
