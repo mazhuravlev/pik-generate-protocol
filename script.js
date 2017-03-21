@@ -163,7 +163,7 @@ function getFile() {
 }
 
 function loadTask() {
-    let apikey = "0/cc880fedbaec6446c336f3178bbce1bf"; //$("#apikey").val();
+    let apikey = $("#apikey").val();
     if (!apikey) {
         throw new WorkflowException("Нужно ввести API ключ");
     }
@@ -269,12 +269,12 @@ function detectIE() {
 
 $(() => {
     $("#apikey").val(localStorage.getItem("apikey"));
+
     if(localStorage.getItem("zipTemplate")) {
         $('#has-saved-template').show();
     }
-    if(!detectIE()) {
-        $('#is-ie').hide();
-    }
+    if(!detectIE()) { $('#is-ie').hide(); }
+
     $("#json-fiedls-buton").click((e) => {
         if (!taskLoaded) {
             e.stopPropagation();
