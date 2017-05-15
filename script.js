@@ -209,15 +209,15 @@ function setProtocolPeople(noteData) {
 }
 
 function getSigns(c, s, p) {
-    const fioRegex = /(^[\wа-яА-Яё]*\s+[\wа-яА-Яё]\.[\wа-яА-Яё]\.)/u;
+    const fioRegex = /(^[\wа-яА-Яё]*\s+[\wа-яА-Яё]\.([\wа-яА-Яё]\.)?)/u;
     let cMatches = fioRegex.exec(c.trim());
     if (!cMatches) {
-        throw new WorkflowException("ФИО председателя невалидно, должно быть Фамилия И.О.");
+        throw new WorkflowException("ФИО председателя невалидно, должно быть Фамилия И.[О.]");
     }
     const names = [cMatches[1]];
     let sMatches = fioRegex.exec(s.trim());
     if (!sMatches) {
-        throw new WorkflowException("ФИО секретаря невалидно, должно быть Фамилия И.О.");
+        throw new WorkflowException("ФИО секретаря невалидно, должно быть Фамилия И.[О.]");
     }
     if (names.indexOf(sMatches[1]) === -1) {
         names.push(sMatches[1]);
